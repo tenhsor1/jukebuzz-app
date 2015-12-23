@@ -1,10 +1,6 @@
-// Ionic Starter App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
-// 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'ionic-material', 'starter.controllers'])
+// Jukebuzz App
+// 'jukebuzz.controllers' is found in controllers.js
+angular.module('jukebuzz', ['ionic', 'ionic-material', 'jukebuzz.utils', 'jukebuzz.controllers', 'ionMdInput'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -21,7 +17,9 @@ angular.module('starter', ['ionic', 'ionic-material', 'starter.controllers'])
     }
   });
 })
-
+.constant('urls', {
+     BASE_API: 'http://192.168.100.11:3000/v1'
+})
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
 
@@ -40,7 +38,25 @@ angular.module('starter', ['ionic', 'ionic-material', 'starter.controllers'])
       }
     }
   })
+  .state('app.login', {
+      url: "/login",
+      views: {
+        'menuContent': {
+          templateUrl: "templates/login.html",
+          controller: 'LoginCtrl'
+        }
+      }
+    })
 
+  .state('app.signup', {
+      url: "/signup",
+      views: {
+        'menuContent': {
+          templateUrl: "templates/signup.html",
+          controller: 'SignUpCtrl'
+        }
+      }
+    })
   .state('app.browse', {
       url: '/browse',
       views: {
@@ -69,5 +85,5 @@ angular.module('starter', ['ionic', 'ionic-material', 'starter.controllers'])
     }
   });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/app/login');
 });

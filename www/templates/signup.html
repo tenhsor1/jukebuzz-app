@@ -1,0 +1,31 @@
+<ion-view view-title="Login" align-title="left">
+    <ion-content style="background: url(img/login.jpg) center; background-size: cover;">
+        <form name="form" ng-submit="submit(form)" accessibleForm novalidate>
+            <div class="list">
+
+                <ion-md-input placeholder="E-mail" name="email" class="white" highlight-color="light" type="text" ng-model="signup.email" ng-required="true" ng-email="true"></ion-md-input>
+
+                <ion-md-input placeholder="Password" name="password" class="white" highlight-color="light" type="password"  ng-model="signup.password" ng-required="true" ng-minlength="6" ng-maxlength="64"></ion-md-input>
+
+                <ion-md-input placeholder="Dirección" name="address" class="white" highlight-color="light" type="text"  ng-model="signup.address" ng-required="true" ng-minlength="10" ng-maxlength="100"></ion-md-input>
+
+                <ion-md-input placeholder="Nombre" name="name" class="white" highlight-color="light" type="text" ng-model="signup.firstName" ng-required="true" ng-minlength="2" ng-maxlength="45"></ion-md-input>
+
+                <label class="item item-select select-md">
+                    <select class="form-control" name="country" ng-model="signup.country" ng-options="country.id as country.name for country in countries" ng-change="populateStates()" ng-required="true">
+                        <option value="">Selecciona</option>
+                    </select>
+                </label>
+                <label class="item item-select select-md">
+                    <select class="form-control" name="state" ng-model="signup.stateId" ng-options="state.id as state.name for state in states" ng-required="true">
+                        <option value="">Selecciona</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="padding">
+                <button class="button button-full button-assertive ink" type="submit">Registrarse</button>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

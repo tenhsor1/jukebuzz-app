@@ -1,8 +1,4 @@
 // Jukebuzz App
-
-// angular.module is a global place for creating, registering and retrieving Angular modules
-// 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
-// the 2nd parameter is an array of 'requires'
 // 'jukebuzz.controllers' is found in controllers.js
 angular.module('jukebuzz', ['ionic', 'ionic-material', 'jukebuzz.utils', 'jukebuzz.controllers', 'ionMdInput'])
 
@@ -42,7 +38,6 @@ angular.module('jukebuzz', ['ionic', 'ionic-material', 'jukebuzz.utils', 'jukebu
       }
     }
   })
-
   .state('app.login', {
       url: "/login",
       views: {
@@ -62,7 +57,6 @@ angular.module('jukebuzz', ['ionic', 'ionic-material', 'jukebuzz.utils', 'jukebu
         }
       }
     })
-
   .state('app.browse', {
       url: '/browse',
       views: {

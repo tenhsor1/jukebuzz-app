@@ -1,0 +1,74 @@
+/* Empty. Add your own CSS if you like */
+.app-icon-text{
+    font-family: "Kaushan Script","Helvetica Neue",Helvetica,Arial,cursive;
+}
+
+.main-color{
+    color: #FF9900;
+}
+
+.white{
+    color: #FFFFFF !important;
+}
+
+.white > .input-label{
+    color: #FFFFFF !important;
+}
+
+.input-label{
+    margin-left: 10px;
+}
+
+.item-md-label{
+    padding: 30px 30px 0 0;
+}
+
+.button-no-margin{
+    margin: 0 !important;
+}
+
+.button-no-padding{
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.select-md{
+    width: 100%;
+    margin-top: 30px;
+}
+
+.select-md select{
+    width: 100%;
+    max-width: 100%;
+    border: medium none;
+    background: #FFF none repeat scroll 0% 0%;
+}
+
+
+/*.select-md{
+    width: 100%;
+    margin-left: 10px;
+    margin-top: 30px;
+}*/
+
+/*
+.select-md select {
+    -moz-appearance: none;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    padding: 0px 45px 0px 0px;
+    max-width: 100%;
+    border: medium none;
+    background: #FFF none repeat scroll 0% 0%;
+    color: #333;
+    text-indent: 0.01px;
+    text-overflow: "";
+    white-space: nowrap;
+    font-size: 14px;
+    cursor: pointer;
+    direction: rtl;
+    width: 100%;
+    margin-right: 100px !important;
+}*/

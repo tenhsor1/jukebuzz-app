@@ -83,22 +83,153 @@ angular.module('jukebuzz.controllers', [])
   };
 })
 
-.controller('PlaylistsCtrl', function($scope, ionicMaterialMotion, ionicMaterialInk, $localstorage) {
+.controller('PlacesCtrl', function(
+  $scope,
+  $http,
+  $ionicPopup,
+  ionicMaterialMotion,
+  ionicMaterialInk,
+  $localstorage,
+  urls
+  ) {
   // Set Header
   $scope.$parent.showHeader();
-  $scope.playlists = [
-    { title: 'Reggae', id: 1 },
-    { title: 'Chill', id: 2 },
-    { title: 'Dubstep', id: 3 },
-    { title: 'Indie', id: 4 },
-    { title: 'Rap', id: 5 },
-    { title: 'Cowbell', id: 6 }
-  ];
+
+  $scope.places = [];
+  var user = $localstorage.getObject('user');
+
+  $http.get(urls.BASE_API + '/places/state/' + user.stateId)
+    .success(function(result, status){
+      $scope.places = result.data;
+    })
+    .error(function(result, status){
+      console.log(result);
+    });
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
-})
+.controller('PlaceCtrl', function(
+  $scope,
+  $stateParams,
+  $http,
+  $interval,
+  $ionicPopup,
+  $ionicHistory,
+  urls) {
+  var placeId  = $stateParams.placeId;
+  $scope.jukeboxes = [];
 
+  function getJukeboxes(){
+    $http.get(urls.BASE_API + '/places/' + placeId + '/jukeboxes')
+    .success(function(result, status){
+      $scope.jukeboxes = result.data;
+    });
+  }
+
+  $http.get(urls.BASE_API + '/places/' + placeId + '/jukeboxes')
+    .success(function(result, status){
+      $scope.jukeboxes = result.data;
+      if($scope.jukeboxes.length <= 0){
+        var alertPopup = $ionicPopup.alert({
+            title: 'No hay rockolas',
+            template: 'No se encontraron rockolas activas para éste establecimiento.'
+        });
+        alertPopup.then(function(res) {
+          $ionicHistory.goBack();
+        });
+
+      }
+    })
+    .error(function(result, status){
+      $scope.jukeboxes = [];
+      console.log(result);
+      var alertPopup = $ionicPopup.alert({
+            title: 'No hay rockolas',
+            template: 'No se encontraron rockolas activas para éste establecimiento.'
+        });
+      alertPopup.then(function(res) {
+        $ionicHistory.goBack();
+      });
+    });
+
+  $interval(getJukeboxes, 10000);
+
+})
+.controller('JukeboxCtrl', function(
+  $scope,
+  $stateParams,
+  $http,
+  $interval,
+  $ionicPopup,
+  $ionicHistory,
+  urls,
+  Errors
+  ){
+  var jukeboxId  = $stateParams.jukeboxId;
+  var placeId = $stateParams.placeId;
+  $scope.songs = [];
+
+  $scope.vote = function(song){
+    var params = {
+      'songId': song.id,
+      'listId': song.listId,
+      'jukeboxId': song.jukeboxId,
+      'placeId': placeId
+    };
+
+    $http.post(urls.BASE_API + '/votes', params)
+    .success(function(result, status){
+      var alertPopup = $ionicPopup.alert({
+          title: 'Exito!',
+          template: 'El voto fue generado correctamente'
+      });
+    })
+    .error(function(error, status){
+      message = Errors.postVote(error);
+      var alertPopup = $ionicPopup.alert({
+          title: 'Error al votar!',
+          template: message
+      });
+    });
+  };
+
+   $http.get(urls.BASE_API + '/jukeboxes/' + jukeboxId + '?populate=lists')
+    .success(function(result, status){
+      var lists = result.data.lists;
+      if(lists.length <= 0){
+        var alertPopup = $ionicPopup.alert({
+            title: 'No hay canciones',
+            template: 'La rockola seleccionada no cuenta con canciones'
+        });
+        alertPopup.then(function(res) {
+          $ionicHistory.goBack();
+        });
+      }else{
+        for (var i = 0; i < lists.length; i++) {
+          var list = lists[i];
+          $http.get(urls.BASE_API + '/lists/' + list.id + '/songs')
+          .success(function(result, status){
+            var songs = result.data;
+            for (var j = 0; j < songs.length; j++) {
+              var song = songs[j];
+              song.listId = list.id;
+              song.jukeboxId = jukeboxId;
+              $scope.songs.push(song);
+            }
+          });
+        }
+      }
+    })
+    .error(function(result, status){
+      $scope.songs = [];
+      var alertPopup = $ionicPopup.alert({
+            title: 'No hay canciones',
+            template: 'La rockola seleccionada no cuenta con canciones'
+        });
+      alertPopup.then(function(res) {
+        $ionicHistory.goBack();
+      });
+    });
+})
 .controller('LoginCtrl', function(
   $scope,
   $timeout,
@@ -114,6 +245,26 @@ angular.module('jukebuzz.controllers', [])
     disableAnimate: true,
     disableBack: true
   });
+
+  function successAuth(res){
+    $localstorage.set('token',  res.data.token);
+    $localstorage.setObject('user',  res.data.user);
+    $state.go('app.places');
+  }
+
+  $scope.login = function(){
+    var formData = {
+      email: $scope.login.email,
+      password: $scope.login.password
+    };
+    Auth.signin(formData, successAuth, function(){
+      var alertPopup = $ionicPopup.alert({
+          title: 'Inicio de sesión incorrecto!',
+          template: 'El usuario o contraseña son incorrectos.'
+      });
+    });
+  };
+
   if(typeof $localstorage.get('token') === 'undefined' ||
             $localstorage.get('token') === null){
     $scope.$parent.clearFabs();
@@ -121,25 +272,8 @@ angular.module('jukebuzz.controllers', [])
         $scope.$parent.hideHeader();
     }, 0);
     ionicMaterialInk.displayEffect();
-    function successAuth(res){
-      $localstorage.set('token',  res.data.token);
-      $state.go('app.playlists');
-    }
-
-    $scope.login = function(){
-      var formData = {
-        email: $scope.login.email,
-        password: $scope.login.password
-      };
-      Auth.signin(formData, successAuth, function(){
-        var alertPopup = $ionicPopup.alert({
-            title: 'Inicio de sesión incorrecto!',
-            template: 'El usuario o contraseña son incorrectos.'
-        });
-      });
-    };
   }else{
-    $state.go('app.playlists');
+    $state.go('app.places');
   }
 })
 .controller('SignUpCtrl', function(
@@ -201,16 +335,19 @@ angular.module('jukebuzz.controllers', [])
             //if the user was correctly created, then
             //save the token in local storage and redirect to the admin panel
             var data = result.data;
+            var user = data.user;
             $localstorage.set('token', data.token);
+            $localstorage.setObject('user', user);
+
             var alertPopup = $ionicPopup.alert({
               title: 'Registro exitoso!',
-              template: 'Se creó correctamente tu cuenta ' + $scope.signup.name + '!'
+              template: 'Se creó correctamente tu cuenta ' + $scope.signup.firstName + '!'
             });
             $ionicHistory.nextViewOptions({
               disableAnimate: true,
               disableBack: true
             });
-            $state.go("app.playlists");
+            $state.go("app.places");
           },
           function(error, status){
             //if there is a new error, then Call the service Error

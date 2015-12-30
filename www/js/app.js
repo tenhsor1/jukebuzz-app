@@ -20,7 +20,7 @@ angular.module('jukebuzz', ['ionic', 'ionic-material', 'jukebuzz.utils', 'jukebu
 .constant('urls', {
      BASE_API: 'http://192.168.100.11:3000/v1'
 })
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
   $stateProvider
 
     .state('app', {
@@ -65,25 +65,57 @@ angular.module('jukebuzz', ['ionic', 'ionic-material', 'jukebuzz.utils', 'jukebu
         }
       }
     })
-    .state('app.playlists', {
-      url: '/playlists',
+    .state('app.places', {
+      url: '/places',
       views: {
         'menuContent': {
-          templateUrl: 'templates/playlists.html',
-          controller: 'PlaylistsCtrl'
+          templateUrl: 'templates/places.html',
+          controller: 'PlacesCtrl'
         }
       }
     })
 
   .state('app.single', {
-    url: '/playlists/:playlistId',
+    url: '/places/:placeId',
     views: {
       'menuContent': {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
+        templateUrl: 'templates/place.html',
+        controller: 'PlaceCtrl'
       }
     }
+
+  })
+  .state('app.jukebox', {
+    url: '/jukeboxes/:placeId/:jukeboxId',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/jukebox.html',
+        controller: 'JukeboxCtrl'
+      }
+    }
+
   });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/login');
+
+  $httpProvider.interceptors.push(['$q', '$localstorage', '$injector',
+    function($q, $localstorage, $injector){
+      //return two functions, one for onbefore requests, and one for handling
+      //errors
+      return {
+        'request': function(config){
+          config.headers = config.headers || {};
+          if($localstorage.get('token')){
+            config.headers.Authorization = 'JWT ' + $localstorage.get('token');
+          }
+          return config;
+        },
+        'responseError': function(response){
+          if(response.status == 403){
+          }
+          return $q.reject(response);
+        }
+      };
+    }
+  ]);
 });

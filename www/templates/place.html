@@ -1,0 +1,9 @@
+<ion-view view-title="Rockolas">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="jukebox in jukeboxes" href="#/app/jukeboxes/{{jukebox.placeId}}/{{jukebox.id}}">
+        {{jukebox.name}}
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

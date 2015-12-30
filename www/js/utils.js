@@ -54,6 +54,7 @@ angular.module('jukebuzz.utils', [])
       },
       logout: function(success){
         $localstorage.delete('token');
+        $localstorage.delete('user');
         success();
       },
       getTokenClaims: function(){
@@ -104,6 +105,12 @@ angular.module('jukebuzz.utils', [])
         return data.message;
       }
       return "";
+    },
+    postVote: function(error){
+      if(error.message){
+        return error.message;
+      }
+      return "Hubo un problema al generar el voto, intenta nuevamente mas tarde";
     }
   };
 });

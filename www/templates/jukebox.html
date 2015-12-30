@@ -1,0 +1,9 @@
+<ion-view view-title="Canciones">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="song in songs" ng-click="vote(song)">
+        {{song.title}}
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
